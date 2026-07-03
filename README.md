@@ -2,7 +2,7 @@
 
 # 🎮 NEON PATH PUZZLE
 
-[![GitHub Pages](https://img.shields.io/badge/Play-GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white)](https://robinayzit.github.io/NeonPathPuzzle/)
+[![GitHub Pages](https://img.shields.io/badge/Play-GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white)](https://nrn-world.github.io/NeonPathPuzzle/)
 [![Vercel](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://neon-path-puzzle-nrnworld.vercel.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
