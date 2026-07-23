@@ -388,7 +388,7 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                   >
                     <div className="bg-black/30 backdrop-blur-sm border border-white/10 rounded-xl p-6 space-y-4">
                       <p className="text-sm text-muted-foreground font-exo">Have a level code?</p>
-                      <div className="flex gap-3">
+                      <div className="grid w-full grid-cols-[minmax(0,1fr)_3.5rem] gap-2 sm:grid-cols-[minmax(0,1fr)_4.5rem] sm:gap-3">
                         <input
                           type="text"
                           maxLength={4}
@@ -399,12 +399,12 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                             setCodeError("");
                           }}
                           onKeyDown={(e) => e.key === "Enter" && handleCodeSubmit()}
-                          className="flex-1 px-4 py-3 text-center text-2xl font-mono font-bold bg-white/5 border border-primary/30 rounded-lg text-primary placeholder-muted-foreground focus:outline-none focus:border-primary focus:shadow-[0_0_20px_rgba(0,243,255,0.2)] transition-all"
+                          className="w-full min-w-0 px-3 py-3 text-center text-2xl font-mono font-bold bg-white/5 border border-primary/30 rounded-lg text-primary placeholder-muted-foreground focus:outline-none focus:border-primary focus:shadow-[0_0_20px_rgba(0,243,255,0.2)] transition-all sm:px-4"
                         />
                         <Button
                           onClick={handleCodeSubmit}
                           disabled={codeInput.length !== 4}
-                          className="px-6 bg-secondary hover:bg-secondary/90 text-black font-bold disabled:opacity-30"
+                          className="h-full w-full min-w-0 px-0 bg-secondary hover:bg-secondary/90 text-black font-bold disabled:opacity-30"
                         >
                           GO
                         </Button>
@@ -439,8 +439,11 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                     className="pt-8 text-center"
                   >
                     <p className="text-xs text-muted-foreground/60 font-exo">
-                      Created 2026 by © nRn World
+                      © 2026 nRn World
                     </p>
+                    <a href="#/privacy" className="mt-2 inline-block text-xs text-primary/70 hover:text-primary transition-colors">
+                      Privacy Policy
+                    </a>
                     <div className="flex items-center justify-center gap-2 mt-1">
                       <a 
                         href="mailto:bynrnworld@gmail.com"

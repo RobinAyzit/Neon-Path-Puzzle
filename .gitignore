@@ -26,8 +26,16 @@ dev.db
 .vscode/
 *.suo
 
-# Keys
+# Keys and local release secrets
 *.pem
 *.key
 *.p12
+*.jks
+*.keystore
+keystore.properties
 credentials.json
+local-secrets/
+
+# Android local build files
+android/local.properties
+android/.gradle/
