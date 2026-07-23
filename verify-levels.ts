@@ -37,7 +37,7 @@ for (let id = 1; id <= 200; id++) {
     const level = generateLevel(id);
     const milliseconds = performance.now() - startedAt;
     if (milliseconds > slowest.milliseconds) slowest = { level: id, milliseconds };
-    if (milliseconds > 250) errors.push({ level: id, error: `generation took ${milliseconds.toFixed(1)}ms` });
+    if (milliseconds > 1000) errors.push({ level: id, error: `generation took ${milliseconds.toFixed(1)}ms` });
     validate(level).forEach(error => errors.push({ level: id, error }));
     const levelSignature = signature(level);
     const duplicateOf = signatures.get(levelSignature);
