@@ -1,7 +1,9 @@
-name: Deploy GitHub Pages
+name: Test and Deploy GitHub Pages
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
   workflow_dispatch:
 
@@ -33,21 +35,31 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check TypeScript
+        run: npm run check
+
+      - name: Validate all levels
+        run: npx tsx verify-levels.ts
+
       - name: Build game
         run: npm run build
 
       - name: Prepare Pages fallback files
+        if: github.event_name != 'pull_request'
         run: cp dist/public/index.html dist/public/404.html && touch dist/public/.nojekyll
 
       - name: Setup Pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist/public
 
   deploy:
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
