@@ -1,12 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@shared/routes";
 import { v4 as uuidv4 } from "uuid";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { generateLevel } from "@shared/level-generator";
 
-// Helper to get or create a persistent User ID
 export function useUserId() {
-  const [userId, setUserId] = useState<string>(() => {
+  const [userId] = useState<string>(() => {
     if (typeof window === "undefined") return "";
     try {
       let id = localStorage.getItem("one_line_user_id");
@@ -15,85 +14,91 @@ export function useUserId() {
         localStorage.setItem("one_line_user_id", id);
       }
       return id;
-    } catch (e) {
+    } catch {
       console.warn("localStorage is disabled or restricted, falling back to session ID");
       return uuidv4();
     }
   });
-
   return userId;
 }
 
-// === LOCAL STORAGE HELPERS ===
 const STORAGE_KEY = "neon_path_progress";
+type LocalProgress = { completed: number[]; hints: number[] };
+const fallbackProgress: Record<string, LocalProgress> = {};
 
-// In-memory fallback for progress if localStorage is blocked
-let fallbackProgress: Record<string, any> = {};
+function normalizeProgress(value: unknown): LocalProgress {
+  if (!value || typeof value !== "object") return { completed: [], hints: [] };
+  const candidate = value as Partial<LocalProgress>;
+  return {
+    completed: Array.isArray(candidate.completed)
+      ? candidate.completed.filter(id => Number.isInteger(id) && id >= 1 && id <= 200)
+      : [],
+    hints: Array.isArray(candidate.hints)
+      ? candidate.hints.filter(id => Number.isInteger(id) && id >= 1 && id <= 200)
+      : [],
+  };
+}
 
-function getLocalProgress(userId: string) {
+function getLocalProgress(userId: string): LocalProgress {
   try {
     const data = localStorage.getItem(`${STORAGE_KEY}_${userId}`);
-    return data ? JSON.parse(data) : { completed: [], hints: [] };
-  } catch (e) {
+    return data ? normalizeProgress(JSON.parse(data)) : { completed: [], hints: [] };
+  } catch {
     return fallbackProgress[userId] || { completed: [], hints: [] };
   }
 }
 
 function saveLocalProgress(userId: string, levelId: number, completed: boolean, hintUsed: boolean) {
   const progress = getLocalProgress(userId);
-  if (completed && !progress.completed.includes(levelId)) {
-    progress.completed.push(levelId);
-  }
-  if (hintUsed && !progress.hints.includes(levelId)) {
-    progress.hints.push(levelId);
-  }
+  if (completed && !progress.completed.includes(levelId)) progress.completed.push(levelId);
+  if (hintUsed && !progress.hints.includes(levelId)) progress.hints.push(levelId);
   try {
     localStorage.setItem(`${STORAGE_KEY}_${userId}`, JSON.stringify(progress));
-  } catch (e) {
+  } catch {
     fallbackProgress[userId] = progress;
   }
   return progress;
 }
 
-// === API HOOKS (Now Local) ===
+function isLevelLocked(levelId: number, completed: Set<number>) {
+  if (levelId === 1) return false;
+  if (levelId <= 100) return !completed.has(levelId - 1);
+  const firstHundredComplete = Array.from({ length: 100 }, (_, index) => index + 1)
+    .every(id => completed.has(id));
+  return !firstHundredComplete || !completed.has(levelId - 1);
+}
 
-// List all levels
 export function useLevels(userId?: string) {
   return useQuery({
     queryKey: [api.levels.list.path, userId],
     queryFn: async () => {
       if (!userId) return [];
       const progress = getLocalProgress(userId);
-      const completedSet = new Set(progress.completed as number[]);
-      const hintsSet = new Set(progress.hints as number[]);
-
-      const allFirstHundredCompleted = Array.from({ length: 100 }, (_, i) => i + 1)
-        .every(id => completedSet.has(id));
-
-      const levels = [];
-      for (let i = 1; i <= 200; i++) {
-        const isCompleted = completedSet.has(i);
-        const hintsUsed = hintsSet.has(i);
-        let isLocked = false;
-        if (i <= 100) {
-          isLocked = i > 1 && !completedSet.has(i - 1);
-        } else {
-          isLocked = !allFirstHundredCompleted || !completedSet.has(i - 1);
-        }
-
-        levels.push({ id: i, isCompleted, isLocked, hintsUsed });
-      }
-      return levels;
+      const completed = new Set(progress.completed);
+      const hints = new Set(progress.hints);
+      return Array.from({ length: 200 }, (_, index) => {
+        const id = index + 1;
+        return {
+          id,
+          isCompleted: completed.has(id),
+          isLocked: isLevelLocked(id, completed),
+          hintsUsed: hints.has(id),
+        };
+      });
     },
     enabled: !!userId,
   });
 }
 
-// Get single level data
-export function useLevel(id: number) {
+export function useLevel(id: number, userId?: string) {
   return useQuery({
-    queryKey: [api.levels.get.path, id],
+    queryKey: [api.levels.get.path, id, userId],
     queryFn: async () => {
+      if (!Number.isInteger(id) || id < 1 || id > 200) throw new Error("Invalid level");
+      if (!userId) throw new Error("Missing player id");
+      const progress = getLocalProgress(userId);
+      const completed = new Set(progress.completed);
+      if (isLevelLocked(id, completed)) throw new Error("Level is locked");
       const level = generateLevel(id);
       return {
         id: level.id,
@@ -101,26 +106,21 @@ export function useLevel(id: number) {
         start: level.start,
         nodes: level.nodes,
         isLocked: false,
-        isCompleted: false
+        isCompleted: completed.has(id),
       };
     },
-    enabled: !!id,
+    enabled: !!userId && Number.isInteger(id) && id >= 1 && id <= 200,
   });
 }
 
-// Get solution for hints
 export function useSolution(id: number) {
   return useQuery({
     queryKey: [api.levels.solution.path, id],
-    queryFn: async () => {
-      const level = generateLevel(id);
-      return { path: level.solution };
-    },
+    queryFn: async () => ({ path: generateLevel(id).solution }),
     enabled: false,
   });
 }
 
-// Sync progress
 export function useUpdateProgress() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -128,25 +128,21 @@ export function useUpdateProgress() {
       saveLocalProgress(data.userId, data.levelId, data.completed, data.hintsUsed);
       return { success: true };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.levels.list.path] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [api.levels.list.path] }),
   });
 }
 
-// Get user progress (Mocked for compatibility)
 export function useUserProgress(userId: string) {
   return useQuery({
     queryKey: [api.progress.get.path, userId],
     queryFn: async () => {
       const progress = getLocalProgress(userId);
       return {
-        currentLevel: Math.max(1, (progress.completed.length || 0) + 1),
-        unlockedLevels: progress.completed, // Simplified
-        completedLevels: progress.completed
+        currentLevel: Math.min(200, Math.max(1, progress.completed.length + 1)),
+        unlockedLevels: progress.completed,
+        completedLevels: progress.completed,
       };
     },
     enabled: !!userId,
   });
 }
-
