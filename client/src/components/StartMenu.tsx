@@ -499,7 +499,6 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                       <ul className="text-muted-foreground space-y-1">
                         <li>- Click to place your path</li>
                         <li>- Click & Drag to draw your solution</li>
-                        <li>- Clear button to reset and try again</li>
                       </ul>
                     </div>
 
@@ -508,7 +507,7 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                       <ul className="text-muted-foreground space-y-1">
                         <li>- You start each level with 3 lives</li>
                         <li>- Each backtrack costs 1 life</li>
-                        <li>- Lose all lives = Game Over (restart from Level 1)</li>
+                        <li>- Lose all lives = Game Over</li>
                       </ul>
                     </div>
 
