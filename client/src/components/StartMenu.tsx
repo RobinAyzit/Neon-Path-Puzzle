@@ -512,7 +512,7 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                       <ul className="text-muted-foreground space-y-1">
                         <li>- Use hint to see the solution (visible for 1.5 seconds)</li>
                         <li>- Only 1 hint per level</li>
-                        <li>- Every level has its own permanent 4-digit code</li>
+                        <li>- Starting at Level 10, every level has a permanent 4-digit code</li>
                         <li>- Save the code and use it again after any refresh or update</li>
                         <li>- Enter the code in the menu to jump directly to that level</li>
                       </ul>
