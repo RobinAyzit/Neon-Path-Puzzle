@@ -1,7 +1,15 @@
-
 import { userProgress } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
+
+interface ProgressRow {
+  id: number;
+  userId: string;
+  levelId: number;
+  completed: boolean | null;
+  hintsUsed: boolean | null;
+  updatedAt: Date | null;
+}
 
 export interface IStorage {
   getUserProgress(userId: string): Promise<number[]>;
@@ -12,12 +20,9 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   async getUserProgress(userId: string): Promise<number[]> {
     try {
-      const progress = await db
-        .select()
-        .from(userProgress)
-        .where(and(eq(userProgress.userId, userId), eq(userProgress.completed, true)));
-      
-      return progress.map((p) => p.levelId);
+      const progress = await db.select().from(userProgress)
+        .where(and(eq(userProgress.userId, userId), eq(userProgress.completed, true))) as ProgressRow[];
+      return progress.map(row => row.levelId);
     } catch (error) {
       console.error("Error getting user progress:", error);
       return [];
@@ -26,18 +31,9 @@ export class DatabaseStorage implements IStorage {
 
   async getHintsUsed(userId: string): Promise<Map<number, boolean>> {
     try {
-      const progress = await db
-        .select()
-        .from(userProgress)
-        .where(eq(userProgress.userId, userId));
-      
-      const hintsMap = new Map<number, boolean>();
-      for (const p of progress) {
-        if (p.hintsUsed) {
-          hintsMap.set(p.levelId, true);
-        }
-      }
-      return hintsMap;
+      const progress = await db.select().from(userProgress)
+        .where(eq(userProgress.userId, userId)) as ProgressRow[];
+      return new Map(progress.filter(row => row.hintsUsed).map(row => [row.levelId, true]));
     } catch (error) {
       console.error("Error getting hints used:", error);
       return new Map();
@@ -46,28 +42,16 @@ export class DatabaseStorage implements IStorage {
 
   async updateUserProgress(userId: string, levelId: number, completed: boolean, hintsUsed: boolean): Promise<void> {
     try {
-      const existing = await db
-        .select()
-        .from(userProgress)
-        .where(and(eq(userProgress.userId, userId), eq(userProgress.levelId, levelId)));
-
+      const existing = await db.select().from(userProgress)
+        .where(and(eq(userProgress.userId, userId), eq(userProgress.levelId, levelId))) as ProgressRow[];
       if (existing.length > 0) {
-        await db
-          .update(userProgress)
-          .set({ 
-            completed: completed || Boolean(existing[0].completed),
-            hintsUsed: hintsUsed || Boolean(existing[0].hintsUsed),
-            updatedAt: new Date() 
-          })
-          .where(eq(userProgress.id, existing[0].id));
+        await db.update(userProgress).set({
+          completed: completed || Boolean(existing[0].completed),
+          hintsUsed: hintsUsed || Boolean(existing[0].hintsUsed),
+          updatedAt: new Date(),
+        }).where(eq(userProgress.id, existing[0].id));
       } else {
-        await db.insert(userProgress).values({
-          userId,
-          levelId,
-          completed,
-          hintsUsed,
-          updatedAt: new Date()
-        });
+        await db.insert(userProgress).values({ userId, levelId, completed, hintsUsed, updatedAt: new Date() });
       }
     } catch (error) {
       console.error("Error updating user progress:", error);

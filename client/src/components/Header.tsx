@@ -1,7 +1,6 @@
 import { Link } from "wouter";
 import { ArrowLeft, RefreshCw, Lightbulb, Heart, Settings, Zap, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeSelector } from "@/components/ThemeSelector";
 import { useState } from "react";
 import { PowerUpInventory } from "@/components/PowerUpInventory";
 import { AchievementsPanel } from "@/components/AchievementsPanel";
@@ -94,9 +93,6 @@ export function Header({ levelId, onReset, onHint, hintsUsed, isHintLoading, liv
             <AchievementsPanel />
           </DialogContent>
         </Dialog>
-
-        {/* Theme Selector */}
-        <ThemeSelector />
 
         <div className="flex gap-0.5 md:gap-1">
           <Button

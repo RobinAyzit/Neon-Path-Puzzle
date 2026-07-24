@@ -8,9 +8,21 @@
     "build": "tsx script/build.ts",
     "start": "cross-env NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "android:sync": "npm run build && cap sync android",
+    "android:open": "cap open android",
+    "android:debug": "powershell -NoProfile -ExecutionPolicy Bypass -File script/android-build.ps1 -Mode Debug",
+    "android:bundle": "powershell -NoProfile -ExecutionPolicy Bypass -File script/android-build.ps1 -Mode Bundle"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.4.2",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3",
+    "@fontsource/exo-2": "^5.3.0",
+    "@fontsource/orbitron": "^5.3.0",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@radix-ui/react-accordion": "^1.2.4",
@@ -82,6 +94,7 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.4.2",
     "@replit/vite-plugin-cartographer": "^0.4.4",
     "@replit/vite-plugin-dev-banner": "^0.1.1",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
