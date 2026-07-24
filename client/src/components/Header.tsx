@@ -99,7 +99,9 @@ export function Header({ levelId, onReset, onHint, hintsUsed, isHintLoading, liv
             variant="outline"
             size="sm"
             onClick={onReset}
-            className="border-white/10 hover:border-primary/50 hover:bg-primary/10 text-primary-foreground/80 hover:text-primary p-1.5 h-auto md:p-2 md:h-9 flex-shrink-0"
+            aria-label="Restart level"
+            title="Restart level"
+            className="border-primary/50 bg-primary/5 text-primary shadow-[0_0_8px_rgba(0,243,255,0.15)] hover:border-primary hover:bg-primary/15 hover:text-primary hover:shadow-[0_0_14px_rgba(0,243,255,0.3)] p-1.5 h-auto md:p-2 md:h-9 flex-shrink-0"
           >
             <RefreshCw className="w-3 h-3 md:w-4 md:h-4" />
           </Button>
