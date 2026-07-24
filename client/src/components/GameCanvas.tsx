@@ -245,10 +245,6 @@ export function GameCanvas({ level, onComplete, showHint, hintPath, onBacktrack,
     const currentHead = path[path.length - 1];
     if (pos.x === currentHead.x && pos.y === currentHead.y) {
       setIsDragging(true);
-    } else if (pos.x === level.start.x && pos.y === level.start.y) {
-      // Allow resetting by clicking start
-      setPath([level.start]);
-      setIsDragging(true);
     }
   }, [path, level.start, getGridPos]);
 

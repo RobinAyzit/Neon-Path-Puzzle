@@ -70,12 +70,9 @@ export default function Game() {
 
   useEffect(() => {
     if (!showHint) return;
-    let duration = 3000;
-    if (levelId > 50) duration = 5000;
-    if (levelId > 100) duration = 10000;
-    const timer = window.setTimeout(() => setShowHint(false), duration);
+    const timer = window.setTimeout(() => setShowHint(false), 1500);
     return () => window.clearTimeout(timer);
-  }, [showHint, levelId]);
+  }, [showHint]);
 
   const handleWin = () => {
     if (hasWon || !level) return;
@@ -145,11 +142,6 @@ export default function Game() {
     });
   };
 
-  const handleReset = () => {
-    setCanvasKey(previous => previous + 1);
-    setShowHint(false);
-  };
-
   const handleNext = () => {
     setLocation(levelId < 200 ? `/play/${levelId + 1}` : "/");
   };
@@ -159,18 +151,13 @@ export default function Game() {
       <div className="h-screen w-full flex flex-col items-center justify-center bg-background gap-6">
         <div className="text-center space-y-4">
           <h2 className="text-5xl font-orbitron font-bold text-destructive neon-text">GAME OVER</h2>
-          <p className="text-muted-foreground font-exo text-lg">You lost all your lives. Restart the level to try again.</p>
+          <p className="text-muted-foreground font-exo text-lg">You lost all your lives. Return to the menu.</p>
         </div>
         <button
-          onClick={() => {
-            setLives(3);
-            setIsGameOver(false);
-            handleReset();
-            setLevelStartTime(Date.now());
-          }}
+          onClick={() => setLocation("/")}
           className="px-8 py-3 bg-primary text-primary-foreground font-orbitron rounded hover:opacity-90 transition-opacity"
         >
-          RESTART LEVEL
+          RETURN TO MENU
         </button>
       </div>
     );
@@ -198,7 +185,6 @@ export default function Game() {
     <div className="h-screen w-screen flex flex-col bg-background overflow-hidden">
       <Header
         levelId={levelId}
-        onReset={handleReset}
         onHint={handleHint}
         hintsUsed={hintUsedThisLevel}
         isHintLoading={isHintLoading}
@@ -226,11 +212,6 @@ export default function Game() {
         levelId={levelId}
         score={score}
         onNext={handleNext}
-        onReplay={() => {
-          setHasWon(false);
-          handleReset();
-          setLevelStartTime(Date.now());
-        }}
       />
     </div>
   );

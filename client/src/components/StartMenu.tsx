@@ -6,6 +6,7 @@ import { X, Lock, CheckCircle, Heart, Play, HelpCircle, Trophy, Zap, Shield, Sta
 import { generateLevelCode, getLevelFromCode } from "@/lib/levelCodes";
 import { getLevelMessage } from "@/lib/levelMessages";
 import { useLevels, useUserId } from "@/hooks/use-game";
+import { unlockLevelsThroughCode } from "@/lib/sessionLevelUnlock";
 import { useTheme } from "@/hooks/use-theme";
 import { themes } from "@/lib/themes";
 import { playClickSound } from "@/lib/sounds";
@@ -237,12 +238,7 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
       return;
     }
 
-    const isLevelCompleted = completedLevels.some(l => l.id === levelId);
-    if (!isLevelCompleted && levelId < 10) {
-      setCodeError("This level hasn't been unlocked yet.");
-      return;
-    }
-
+    unlockLevelsThroughCode(levelId);
     setLocation(`/play/${levelId}`);
   };
 
@@ -499,7 +495,6 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                       <ul className="text-muted-foreground space-y-1">
                         <li>- Click to place your path</li>
                         <li>- Click & Drag to draw your solution</li>
-                        <li>- Clear button to reset and try again</li>
                       </ul>
                     </div>
 
@@ -508,18 +503,18 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                       <ul className="text-muted-foreground space-y-1">
                         <li>- You start each level with 3 lives</li>
                         <li>- Each backtrack costs 1 life</li>
-                        <li>- Lose all lives = Game Over (restart from Level 1)</li>
+                        <li>- Lose all lives = Game Over</li>
                       </ul>
                     </div>
 
                     <div>
                       <h3 className="text-lg font-bold text-secondary mb-2">HINTS & LEVEL CODES</h3>
                       <ul className="text-muted-foreground space-y-1">
-                        <li>- Use hint to see the solution (visible for 3 seconds)</li>
+                        <li>- Use hint to see the solution (visible for 1.5 seconds)</li>
                         <li>- Only 1 hint per level</li>
-                        <li>- After completing Level 10, you will unlock unique codes</li>
-                        <li>- Each level has a unique 4-digit code to jump directly to it</li>
-                        <li>- Enter the code in the menu to skip to that level</li>
+                        <li>- Starting at Level 10, every level has a permanent 4-digit code</li>
+                        <li>- Save the code and use it again after any refresh or update</li>
+                        <li>- Enter the code in the menu to jump directly to that level</li>
                       </ul>
                     </div>
 
@@ -537,7 +532,7 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                     <div>
                       <h3 className="text-lg font-bold text-primary mb-2">PROGRESSION</h3>
                       <p className="text-muted-foreground mb-2">
-                        Complete levels sequentially to unlock the next challenges. 100 levels of increasing difficulty await you in the cyber-logic puzzle matrix. Codes are only valid for completed levels.
+                        Complete levels sequentially to unlock the next challenges. 200 levels of increasing difficulty await you in the cyber-logic puzzle matrix. A saved code always opens its matching level.
                       </p>
                       <p className="text-muted-foreground">
                         <span className="text-secondary font-bold">ELITE CHALLENGE (Levels 101-200):</span> Complete all 100 main levels to unlock the ultimate difficulty tier. These 100 additional levels feature extreme puzzles for champions. Both tiers combined = 200 total levels of relentless progression.

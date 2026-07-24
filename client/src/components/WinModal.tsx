@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Play, Home, Copy, Check } from "lucide-react";
+import { Play, Home, Copy, Check } from "lucide-react";
 import { Link } from "wouter";
 import { generateLevelCode } from "@/lib/levelCodes";
 import { useState } from "react";
@@ -10,10 +10,9 @@ interface WinModalProps {
   levelId: number;
   score: number;
   onNext: () => void;
-  onReplay: () => void;
 }
 
-export function WinModal({ isOpen, levelId, score, onNext, onReplay }: WinModalProps) {
+export function WinModal({ isOpen, levelId, score, onNext }: WinModalProps) {
   const [codeCopied, setCodeCopied] = useState(false);
   const levelCode = generateLevelCode(levelId);
 
@@ -55,7 +54,7 @@ export function WinModal({ isOpen, levelId, score, onNext, onReplay }: WinModalP
               {levelId >= 10 && (
                 <div className="bg-secondary/10 border border-secondary/30 rounded-lg p-4 space-y-2">
                   <p className="text-sm font-exo text-muted-foreground">
-                    Level {levelId} completion code:
+                    Permanent code for Level {levelId}:
                   </p>
                   <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex items-center justify-center gap-3">
                     <code className="text-3xl font-mono font-bold text-secondary tracking-widest">{levelCode}</code>
@@ -82,10 +81,7 @@ export function WinModal({ isOpen, levelId, score, onNext, onReplay }: WinModalP
                   {levelId < 200 ? "Next Level" : "Finish"}
                 </Button>
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={onReplay} className="flex-1 border-white/10 hover:bg-white/5">
-                    <RefreshCw className="w-4 h-4 mr-2" /> Replay
-                  </Button>
-                  <Link href="/" className="flex-1">
+                  <Link href="/" className="w-full">
                     <Button variant="outline" className="w-full border-white/10 hover:bg-white/5">
                       <Home className="w-4 h-4 mr-2" /> Menu
                     </Button>

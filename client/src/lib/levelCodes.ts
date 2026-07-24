@@ -1,20 +1,25 @@
+export const MIN_CODED_LEVEL = 10;
+export const MAX_CODED_LEVEL = 200;
+
 /**
- * Generate a deterministic 4-digit code for a level
- * Same level always generates the same code
- * Different levels always generate different codes
+ * Permanent public level-code contract.
+ *
+ * Never change this multiplier or the formula: players may save a code and
+ * expect it to keep opening the same level after every refresh and release.
+ * 9973 is coprime with 10000, so levels 10-200 all receive unique codes.
  */
+const PERMANENT_CODE_MULTIPLIER = 9973;
+
 export function generateLevelCode(levelId: number): string {
-  // No code for levels 1-9 and 101-109
-  if (levelId < 10 || (levelId >= 101 && levelId < 110)) {
+  if (
+    !Number.isInteger(levelId)
+    || levelId < MIN_CODED_LEVEL
+    || levelId > MAX_CODED_LEVEL
+  ) {
     return "";
   }
 
-  // Use a deterministic hash based on levelId
-  // Shift level ID to get unique 4-digit codes
-  const seed = levelId * 9973; // Prime multiplier for better distribution
-  const hash = Math.abs(seed % 10000);
-  
-  // Ensure it's always 4 digits
+  const hash = (levelId * PERMANENT_CODE_MULTIPLIER) % 10000;
   return String(hash).padStart(4, "0");
 }
 
@@ -27,14 +32,7 @@ export function getLevelFromCode(code: string): number | null {
     return null;
   }
 
-  // Try levels 10-100 and 110-200
-  for (let levelId = 10; levelId <= 100; levelId++) {
-    if (generateLevelCode(levelId) === code) {
-      return levelId;
-    }
-  }
-  
-  for (let levelId = 110; levelId <= 200; levelId++) {
+  for (let levelId = MIN_CODED_LEVEL; levelId <= MAX_CODED_LEVEL; levelId++) {
     if (generateLevelCode(levelId) === code) {
       return levelId;
     }

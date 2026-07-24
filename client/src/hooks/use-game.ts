@@ -3,6 +3,7 @@ import { api } from "@shared/routes";
 import { v4 as uuidv4 } from "uuid";
 import { useState } from "react";
 import { generateLevel } from "@shared/level-generator";
+import { getCodeUnlockedThrough } from "@/lib/sessionLevelUnlock";
 
 export function useUserId() {
   const [userId] = useState<string>(() => {
@@ -60,7 +61,8 @@ function saveLocalProgress(userId: string, levelId: number, completed: boolean, 
   return progress;
 }
 
-function isLevelLocked(levelId: number, completed: Set<number>) {
+function isLevelLocked(levelId: number, completed: Set<number>, codeUnlockedThrough: number) {
+  if (levelId <= codeUnlockedThrough) return false;
   if (levelId === 1) return false;
   if (levelId <= 100) return !completed.has(levelId - 1);
   const firstHundredComplete = Array.from({ length: 100 }, (_, index) => index + 1)
@@ -69,8 +71,9 @@ function isLevelLocked(levelId: number, completed: Set<number>) {
 }
 
 export function useLevels(userId?: string) {
+  const codeUnlockedThrough = getCodeUnlockedThrough();
   return useQuery({
-    queryKey: [api.levels.list.path, userId],
+    queryKey: [api.levels.list.path, userId, codeUnlockedThrough],
     queryFn: async () => {
       if (!userId) return [];
       const progress = getLocalProgress(userId);
@@ -81,7 +84,7 @@ export function useLevels(userId?: string) {
         return {
           id,
           isCompleted: completed.has(id),
-          isLocked: isLevelLocked(id, completed),
+          isLocked: isLevelLocked(id, completed, codeUnlockedThrough),
           hintsUsed: hints.has(id),
         };
       });
@@ -91,14 +94,15 @@ export function useLevels(userId?: string) {
 }
 
 export function useLevel(id: number, userId?: string) {
+  const codeUnlockedThrough = getCodeUnlockedThrough();
   return useQuery({
-    queryKey: [api.levels.get.path, id, userId],
+    queryKey: [api.levels.get.path, id, userId, codeUnlockedThrough],
     queryFn: async () => {
       if (!Number.isInteger(id) || id < 1 || id > 200) throw new Error("Invalid level");
       if (!userId) throw new Error("Missing player id");
       const progress = getLocalProgress(userId);
       const completed = new Set(progress.completed);
-      if (isLevelLocked(id, completed)) throw new Error("Level is locked");
+      if (isLevelLocked(id, completed, codeUnlockedThrough)) throw new Error("Level is locked");
       const level = generateLevel(id);
       return {
         id: level.id,
