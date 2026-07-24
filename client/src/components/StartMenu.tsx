@@ -510,7 +510,7 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                     <div>
                       <h3 className="text-lg font-bold text-secondary mb-2">HINTS & LEVEL CODES</h3>
                       <ul className="text-muted-foreground space-y-1">
-                        <li>- Use hint to see the solution (visible for 3 seconds)</li>
+                        <li>- Use hint to see the solution (visible for 1.5 seconds)</li>
                         <li>- Only 1 hint per level</li>
                         <li>- Every level has its own permanent 4-digit code</li>
                         <li>- Save the code and use it again after any refresh or update</li>
