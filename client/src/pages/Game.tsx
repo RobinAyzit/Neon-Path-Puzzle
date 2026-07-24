@@ -70,12 +70,9 @@ export default function Game() {
 
   useEffect(() => {
     if (!showHint) return;
-    let duration = 3000;
-    if (levelId > 50) duration = 5000;
-    if (levelId > 100) duration = 10000;
-    const timer = window.setTimeout(() => setShowHint(false), duration);
+    const timer = window.setTimeout(() => setShowHint(false), 1500);
     return () => window.clearTimeout(timer);
-  }, [showHint, levelId]);
+  }, [showHint]);
 
   const handleWin = () => {
     if (hasWon || !level) return;
