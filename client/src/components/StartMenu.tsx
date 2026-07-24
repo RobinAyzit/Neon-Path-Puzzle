@@ -512,9 +512,9 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                       <ul className="text-muted-foreground space-y-1">
                         <li>- Use hint to see the solution (visible for 3 seconds)</li>
                         <li>- Only 1 hint per level</li>
-                        <li>- After completing Level 10, you will unlock unique codes</li>
-                        <li>- Each level has a unique 4-digit code to jump directly to it</li>
-                        <li>- Enter the code in the menu to skip to that level</li>
+                        <li>- Every level has its own permanent 4-digit code</li>
+                        <li>- Save the code and use it again after any refresh or update</li>
+                        <li>- Enter the code in the menu to jump directly to that level</li>
                       </ul>
                     </div>
 
@@ -532,7 +532,7 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
                     <div>
                       <h3 className="text-lg font-bold text-primary mb-2">PROGRESSION</h3>
                       <p className="text-muted-foreground mb-2">
-                        Complete levels sequentially to unlock the next challenges. 100 levels of increasing difficulty await you in the cyber-logic puzzle matrix. Codes are only valid for completed levels.
+                        Complete levels sequentially to unlock the next challenges. 200 levels of increasing difficulty await you in the cyber-logic puzzle matrix. A saved code always opens its matching level.
                       </p>
                       <p className="text-muted-foreground">
                         <span className="text-secondary font-bold">ELITE CHALLENGE (Levels 101-200):</span> Complete all 100 main levels to unlock the ultimate difficulty tier. These 100 additional levels feature extreme puzzles for champions. Both tiers combined = 200 total levels of relentless progression.

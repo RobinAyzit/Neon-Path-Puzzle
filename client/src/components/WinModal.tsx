@@ -51,25 +51,23 @@ export function WinModal({ isOpen, levelId, score, onNext }: WinModalProps) {
                 <p className="mt-3 text-2xl font-orbitron font-bold text-primary">{score.toLocaleString()} PTS</p>
               </div>
 
-              {levelId >= 10 && (
-                <div className="bg-secondary/10 border border-secondary/30 rounded-lg p-4 space-y-2">
-                  <p className="text-sm font-exo text-muted-foreground">
-                    Level {levelId} completion code:
-                  </p>
-                  <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex items-center justify-center gap-3">
-                    <code className="text-3xl font-mono font-bold text-secondary tracking-widest">{levelCode}</code>
-                    <button
-                      onClick={handleCopyCode}
-                      aria-label="Copy level code"
-                      className="p-2 hover:bg-secondary/20 rounded transition-colors"
-                    >
-                      {codeCopied
-                        ? <Check className="w-5 h-5 text-secondary" />
-                        : <Copy className="w-5 h-5 text-secondary/60 hover:text-secondary" />}
-                    </button>
-                  </motion.div>
-                </div>
-              )}
+              <div className="bg-secondary/10 border border-secondary/30 rounded-lg p-4 space-y-2">
+                <p className="text-sm font-exo text-muted-foreground">
+                  Permanent code for Level {levelId}:
+                </p>
+                <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex items-center justify-center gap-3">
+                  <code className="text-3xl font-mono font-bold text-secondary tracking-widest">{levelCode}</code>
+                  <button
+                    onClick={handleCopyCode}
+                    aria-label="Copy level code"
+                    className="p-2 hover:bg-secondary/20 rounded transition-colors"
+                  >
+                    {codeCopied
+                      ? <Check className="w-5 h-5 text-secondary" />
+                      : <Copy className="w-5 h-5 text-secondary/60 hover:text-secondary" />}
+                  </button>
+                </motion.div>
+              </div>
 
               <div className="flex flex-col gap-3 pt-4">
                 <Button
