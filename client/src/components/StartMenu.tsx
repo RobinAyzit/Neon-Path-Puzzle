@@ -6,6 +6,7 @@ import { X, Lock, CheckCircle, Heart, Play, HelpCircle, Trophy, Zap, Shield, Sta
 import { generateLevelCode, getLevelFromCode } from "@/lib/levelCodes";
 import { getLevelMessage } from "@/lib/levelMessages";
 import { useLevels, useUserId } from "@/hooks/use-game";
+import { unlockLevelsThroughCode } from "@/lib/sessionLevelUnlock";
 import { useTheme } from "@/hooks/use-theme";
 import { themes } from "@/lib/themes";
 import { playClickSound } from "@/lib/sounds";
@@ -237,12 +238,7 @@ export function StartMenu({ onStart, onStartLevel }: StartMenuProps) {
       return;
     }
 
-    const isLevelCompleted = completedLevels.some(l => l.id === levelId);
-    if (!isLevelCompleted && levelId < 10) {
-      setCodeError("This level hasn't been unlocked yet.");
-      return;
-    }
-
+    unlockLevelsThroughCode(levelId);
     setLocation(`/play/${levelId}`);
   };
 
