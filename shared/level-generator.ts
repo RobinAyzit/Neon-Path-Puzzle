@@ -17,33 +17,51 @@ export interface GeneratedLevel {
   solution: Point[];
 }
 
+interface DifficultyTier {
+  from: number;
+  to: number;
+  gridSize: number;
+  startCoverage: number;
+  endCoverage: number;
+}
+
+/**
+ * The visual component scales with gridSize, so difficulty can increase
+ * without changing the canvas, controls, or screen layout.
+ */
+const DIFFICULTY_TIERS: DifficultyTier[] = [
+  { from: 1, to: 3, gridSize: 3, startCoverage: 0.55, endCoverage: 0.70 },
+  { from: 4, to: 9, gridSize: 4, startCoverage: 0.50, endCoverage: 0.68 },
+  { from: 10, to: 12, gridSize: 4, startCoverage: 0.70, endCoverage: 0.78 },
+  { from: 13, to: 20, gridSize: 5, startCoverage: 0.58, endCoverage: 0.76 },
+  { from: 21, to: 23, gridSize: 5, startCoverage: 0.76, endCoverage: 0.82 },
+  { from: 24, to: 29, gridSize: 6, startCoverage: 0.62, endCoverage: 0.78 },
+  { from: 30, to: 39, gridSize: 6, startCoverage: 0.80, endCoverage: 0.88 },
+  { from: 40, to: 50, gridSize: 7, startCoverage: 0.78, endCoverage: 0.88 },
+  { from: 51, to: 75, gridSize: 8, startCoverage: 0.78, endCoverage: 0.88 },
+  { from: 76, to: 100, gridSize: 8, startCoverage: 0.89, endCoverage: 0.95 },
+  { from: 101, to: 125, gridSize: 9, startCoverage: 0.86, endCoverage: 0.93 },
+  { from: 126, to: 150, gridSize: 9, startCoverage: 0.93, endCoverage: 0.97 },
+  { from: 151, to: 175, gridSize: 10, startCoverage: 0.92, endCoverage: 0.97 },
+  { from: 176, to: 200, gridSize: 10, startCoverage: 0.97, endCoverage: 0.99 },
+];
+
 function getLevelShape(levelId: number) {
-  let difficulty: number;
-  if (levelId <= 4) difficulty = 0.2 + (levelId / 4) * 0.15;
-  else if (levelId <= 10) difficulty = 0.35 + ((levelId - 4) / 6) * 0.35;
-  else if (levelId <= 20) difficulty = 0.70 + ((levelId - 10) / 10) * 0.20;
-  else if (levelId <= 31) difficulty = 0.90 + ((levelId - 20) / 11) * 0.10;
-  else if (levelId <= 100) difficulty = 1;
-  else if (levelId <= 130) difficulty = 1 + ((levelId - 100) / 30) * 0.15;
-  else if (levelId <= 170) difficulty = 1.15 + ((levelId - 130) / 40) * 0.2;
-  else difficulty = 1.35 + ((levelId - 170) / 30) * 0.15;
+  const tier = DIFFICULTY_TIERS.find(({ from, to }) => levelId >= from && levelId <= to);
+  if (!tier) throw new RangeError(`No difficulty tier configured for Level ${levelId}`);
 
-  let gridSize = 3;
-  if (levelId > 4) gridSize = 4;
-  if (levelId > 10) gridSize = 5;
-  if (levelId > 16) gridSize = 6;
-  if (levelId > 31) gridSize = 7;
-  if (levelId > 60) gridSize = 8;
-
-  let coverage = 0.4 + difficulty * 0.5;
-  if (levelId <= 5) coverage = Math.max(0.65, coverage);
-  else if (levelId <= 15) coverage = Math.max(0.75, coverage);
-  else if (levelId <= 31) coverage = Math.max(0.85, coverage);
-  if (levelId > 100) coverage = Math.min(0.95, coverage * 1.1);
+  const progress = tier.to === tier.from
+    ? 1
+    : (levelId - tier.from) / (tier.to - tier.from);
+  const coverage = tier.startCoverage
+    + (tier.endCoverage - tier.startCoverage) * progress;
 
   return {
-    gridSize,
-    targetLength: Math.max(3, Math.floor(gridSize * gridSize * coverage)),
+    gridSize: tier.gridSize,
+    targetLength: Math.max(
+      3,
+      Math.round(tier.gridSize * tier.gridSize * coverage),
+    ),
   };
 }
 
@@ -182,8 +200,16 @@ function createCandidate(levelId: number, variant: number): GeneratedLevel {
   };
 }
 
+/** Treat rotations and mirror images as the same visual layout. */
 function layoutSignature(level: GeneratedLevel) {
-  return `${level.gridSize}|${level.nodes.map(node => `${node.x},${node.y}`).join(";")}`;
+  const signatures = Array.from({ length: 8 }, (_, variant) => {
+    const transformed = level.nodes
+      .map(node => transform(node, level.gridSize, variant))
+      .sort((a, b) => (a.y - b.y) || (a.x - b.x));
+    return `${level.gridSize}|${transformed.map(node => `${node.x},${node.y}`).join(";")}`;
+  });
+
+  return signatures.sort()[0];
 }
 
 function generateThrough(targetLevelId: number) {
