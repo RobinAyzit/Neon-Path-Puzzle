@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ArrowLeft, RefreshCw, Lightbulb, Heart, Settings, Zap, Trophy } from "lucide-react";
+import { ArrowLeft, Lightbulb, Heart, Zap, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { PowerUpInventory } from "@/components/PowerUpInventory";
@@ -8,14 +8,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 interface HeaderProps {
   levelId: number;
-  onReset: () => void;
   onHint: () => void;
   hintsUsed: boolean;
   isHintLoading: boolean;
   lives: number;
 }
 
-export function Header({ levelId, onReset, onHint, hintsUsed, isHintLoading, lives }: HeaderProps) {
+export function Header({ levelId, onHint, hintsUsed, isHintLoading, lives }: HeaderProps) {
   const [showPowerUps, setShowPowerUps] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
 
@@ -78,7 +77,7 @@ export function Header({ levelId, onReset, onHint, hintsUsed, isHintLoading, liv
             <Button
               variant="outline"
               size="sm"
-              className="border-white/10 hover:border-yellow-500/50 hover:bg-yellow-500/10 text-yellow-400 hover:text-yellow-300 p-1.5 h-auto md:p-2 md:h-9 flex-shrink-0"
+              className="border-primary/50 bg-primary/5 text-primary shadow-[0_0_8px_rgba(0,243,255,0.15)] hover:border-primary hover:bg-primary/15 hover:text-primary hover:shadow-[0_0_14px_rgba(0,243,255,0.3)] p-1.5 h-auto md:p-2 md:h-9 flex-shrink-0"
             >
               <Trophy className="w-3 h-3 md:w-4 md:h-4" />
             </Button>
@@ -86,7 +85,7 @@ export function Header({ levelId, onReset, onHint, hintsUsed, isHintLoading, liv
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-yellow-400" />
+                <Trophy className="w-5 h-5 text-primary" />
                 Achievements
               </DialogTitle>
             </DialogHeader>
@@ -95,17 +94,6 @@ export function Header({ levelId, onReset, onHint, hintsUsed, isHintLoading, liv
         </Dialog>
 
         <div className="flex gap-0.5 md:gap-1">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onReset}
-            aria-label="Restart level"
-            title="Restart level"
-            className="border-primary/50 bg-primary/5 text-primary shadow-[0_0_8px_rgba(0,243,255,0.15)] hover:border-primary hover:bg-primary/15 hover:text-primary hover:shadow-[0_0_14px_rgba(0,243,255,0.3)] p-1.5 h-auto md:p-2 md:h-9 flex-shrink-0"
-          >
-            <RefreshCw className="w-3 h-3 md:w-4 md:h-4" />
-          </Button>
-
           <Button
             variant="outline"
             size="sm"
